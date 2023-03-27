@@ -190,38 +190,35 @@ See `run-hooks'."
   (syntax-propertize-rules
    ("\\\\[[A-Z][A-Za-z]*]" (0 "_"))))
 
+(defconst wolfram-symbol-subfix
+  (rx (* letter) (* num) (* "`" (+ letter) (* num)) (* space))
+  "the rx for a wolfram symbol subfix.")
+
+(defconst wolfram-operator
+  (rx (or "@" "/@" "//@" "@@" "@@@"))
+  "the rx for a wolfram operator.")
+
 (defvar wolfram-font-lock-keywords
-  '(
-    ("^In\[[0-9]+\]:=" . font-lock-keyword-face)
-    ("^Out\[[0-9]+\]=" . font-lock-keyword-face)
-    ("^Out\[[0-9]+\]//[A-Za-z][A-Za-z0-9]*=" . font-lock-keyword-face)
-    ("\\([A-Za-z][A-Za-z0-9`]*\\)[ \t]*[\[][ \t]*[\[]" 1 "default")
-    ("\\([A-Za-z][A-Za-z0-9`]*\\)[ \t]*[\[]" 1 font-lock-function-name-face)
-    ("//[ \t\f\n]*\\([A-Za-z][A-Za-z0-9`]*\\)" 1 font-lock-function-name-face)
-    ("\\([A-Za-z][A-Za-z0-9`]*\\)[ \t\f\n]*/@" 1 font-lock-function-name-face)
-    ("\\([A-Za-z][A-Za-z0-9`]*\\)[ \t\f\n]*//@" 1 font-lock-function-name-face)
-    ("\\([A-Za-z][A-Za-z0-9`]*\\)[ \t\f\n]*@@" 1 font-lock-function-name-face)
-    ("~[ \t]*\\([A-Za-z][A-Za-z0-9`]*\\)[ \t]*~" 1 font-lock-function-name-face)
-    ("_[) \t]*\\?\\([A-Za-z][A-Za-z0-9`]*\\)" 1 font-lock-function-name-face)
-    ("\\(&&\\)" 1 "default")
-    ("&" . font-lock-function-name-face)
-    ("\\\\[[A-Za-z][A-Za-z0-9]*\]" . font-lock-constant-face )
-    ("$[A-Za-z0-9]+" . font-lock-variable-name-face )
-    ("\\([A-Za-z0-9]+\\)[ \t]*\\->" 1 font-lock-type-face )
-    ("<<[ \t\f\n]*[A-Za-z][A-Za-z0-9]*`[ \t\f\n]*[A-Za-z][A-Za-z0-9]*[ \t\f\n]*`"
-     . font-lock-type-face )
-    ("[A-Za-z][A-Za-z0-9]*::[A-Za-z][A-Za-z0-9]*" . font-lock-warning-face)
-    ("\\[Calculating\\.\\.\\.\\]" . font-lock-warning-face)
-    ("\\[Mathematica.*\\]" . font-lock-warning-face)
-    ("^Interrupt>" . font-lock-warning-face)
-    ("-Graphics-" . font-lock-type-face)
-    ("-DensityGraphics-" . font-lock-type-face)
-    ("-ContourGraphics-" . font-lock-type-face)
-    ("-SurfaceGraphics-" . font-lock-type-face)
-    ("-Graphics3D-" . font-lock-type-face)
-    ("-GraphicsArray-" . font-lock-type-face)
-    ("-Sound-" . font-lock-type-face)
-    ("-CompiledCode-" . font-lock-type-face)))
+  `(
+    ;; font-lock-type-face
+    (,(rx (or "True" "False" "None")) . font-lock-constant-face)
+    (,(rx (group letter (regexp wolfram-symbol-subfix)) (= 2 "[")) 1 "default")
+    (,(rx (not letter) (group upper (regexp wolfram-symbol-subfix)) (or "[" (regexp wolfram-operator))) 1 font-lock-builtin-face)
+    (,(rx "//" (* space) (group upper (regexp wolfram-symbol-subfix))) 1 font-lock-builtin-face)
+    (,(rx "~" (* space) (group upper (regexp wolfram-symbol-subfix)) "~") 1 font-lock-builtin-face)
+    (,(rx "_" (* space ")") "?" (group upper (regexp wolfram-symbol-subfix))) 1 font-lock-builtin-face)
+    (,(rx (not letter) (group lower (regexp wolfram-symbol-subfix)) (or "[" (regexp wolfram-operator))) 1 font-lock-function-name-face)
+    (,(rx "//" (* space) (group lower (regexp wolfram-symbol-subfix))) 1 font-lock-function-name-face)
+    (,(rx "~" (* space) (group lower (regexp wolfram-symbol-subfix)) "~") 1 font-lock-function-name-face)
+    (,(rx "_" (* space ")") "?" (group lower (regexp wolfram-symbol-subfix))) 1 font-lock-function-name-face)
+    ;; FIXME bug when nest function call
+    (,(rx "[" (group upper (regexp wolfram-symbol-subfix)) (or "[" (regexp wolfram-operator))) 1 font-lock-builtin-face)
+    (,(rx "[" (group lower (regexp wolfram-symbol-subfix)) (or "[" (regexp wolfram-operator))) 1 font-lock-function-name-face)
+    (,(rx (or "<<" ";;" "&&" "||" "&" "^=" "->" ":>" "/." "/;" "/:" "|->" "@" "/@" "//@" "@@" "@@@")) . font-lock-keyword-face)
+    (,(rx "$" letter (regexp wolfram-symbol-subfix)) . font-lock-variable-name-face)
+    (,(rx (** 1 2 "#") (* letter) (* num)) . font-lock-variable-name-face)
+    (,(rx (* letter) (* num) (** 1 3 "_")) . font-lock-variable-name-face)
+    (,(rx (group-n 1 (+ letter) (* num)) "::" (group-n 2 (+ letter))) (1 font-lock-variable-name-face) (2 font-lock-warning-face))))
 
 (defvar wolfram-outline-regexp "\\((\\*\\|.+?:=\\)")
 
