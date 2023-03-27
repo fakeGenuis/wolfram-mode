@@ -143,17 +143,18 @@ See `run-hooks'."
     (modify-syntax-entry ?\^m " " syntax-table)
 
     ;; comments and parens
-    (modify-syntax-entry ?( "()1n" syntax-table)
-    (modify-syntax-entry ?) ")(4n" syntax-table)
-    (modify-syntax-entry ?* "_ 23n" syntax-table)
+    (modify-syntax-entry ?\( "()1n" syntax-table)
+    (modify-syntax-entry ?\) ")(4n" syntax-table)
+    (modify-syntax-entry ?* ".23n" syntax-table)
 
     ;; pure parens
-    (modify-syntax-entry ?[ "(]" syntax-table)
-    (modify-syntax-entry ?] ")[" syntax-table)
+    (modify-syntax-entry ?\[ "(]" syntax-table)
+    (modify-syntax-entry ?\] ")[" syntax-table)
     (modify-syntax-entry ?{ "(}" syntax-table)
     (modify-syntax-entry ?} "){" syntax-table)
 
     ;; punctuation
+    (modify-syntax-entry ?? "." syntax-table)
     (modify-syntax-entry ?= "." syntax-table)
     (modify-syntax-entry ?: "." syntax-table)
     (modify-syntax-entry ?% "." syntax-table)
@@ -165,22 +166,20 @@ See `run-hooks'."
     (modify-syntax-entry ?/ "." syntax-table)
     (modify-syntax-entry ?! "." syntax-table)
     (modify-syntax-entry ?@ "." syntax-table)
-    (modify-syntax-entry ?# "." syntax-table)
-    (modify-syntax-entry ?\' "." syntax-table)
+    (modify-syntax-entry ?- "." syntax-table)
+    (modify-syntax-entry ?. "." syntax-table)
+    (modify-syntax-entry ?^ "." syntax-table)
+    (modify-syntax-entry ?+ "." syntax-table)
 
     ;; quotes
     (modify-syntax-entry ?\\ "\\" syntax-table)
     (modify-syntax-entry ?\" "\"" syntax-table)
 
-    ;; for Math numbers, the following would be better as
-    ;; parts of symbols
-    (modify-syntax-entry ?- "_" syntax-table)
-    (modify-syntax-entry ?. "_" syntax-table)
+    ;; symbol
     (modify-syntax-entry ?\` "_" syntax-table)
-    (modify-syntax-entry ?^ "_" syntax-table)
-
     (modify-syntax-entry ?$ "_" syntax-table)
-    (modify-syntax-entry ?+ "_" syntax-table)
+    (modify-syntax-entry ?# "_" syntax-table)
+    (modify-syntax-entry ?\' "_" syntax-table)
 
     syntax-table)
   "Syntax table used in `wolfram-mode'.")
