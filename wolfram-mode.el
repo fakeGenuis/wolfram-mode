@@ -109,7 +109,7 @@ See `run-hooks'."
   :type '(repeat string)
   :group 'wolfram)
 
-(defcustom wolfram-indent 8
+(defcustom wolfram-indent 4
   "Basic Indentation for newline."
   :type 'integer
   :group 'wolfram)
