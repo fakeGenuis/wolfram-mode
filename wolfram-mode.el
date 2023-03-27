@@ -88,35 +88,36 @@
 
 ;; ** Customs Variables
 
-(defgroup wolfram-mode nil
+(defgroup wolfram nil
   "Editing Wolfram Language code"
+  :prefix "wolfram-"
   :group 'languages)
 
-(defcustom wolfram-mode-hook nil
+(defcustom wolfram-hook nil
   "Normal hook run when entering `wolfram-mode'.
 See `run-hooks'."
   :type 'hook
-  :group 'wolfram-mode)
+  :group 'wolfram)
 
 (defcustom wolfram-program "math"
   "Command to invoke at `run-wolfram'."
   :type 'string
-  :group 'wolfram-mode)
+  :group 'wolfram)
 
 (defcustom wolfram-program-arguments '()
   "Additional arguments to `wolfram-program'."
   :type '(repeat string)
-  :group 'wolfram-mode)
+  :group 'wolfram)
 
 (defcustom wolfram-indent 8
   "Basic Indentation for newline."
   :type 'integer
-  :group 'wolfram-mode)
+  :group 'wolfram)
 
 (defcustom wolfram-path nil
   "Directory in Mathematica $Path. Emacs has to be able to write in this directory."
   :type 'string
-  :group 'wolfram-mode)
+  :group 'wolfram)
 
 ;; ** wolfram-mode
 
