@@ -191,12 +191,12 @@ See `run-hooks'."
    ("\\\\[[A-Z][A-Za-z]*]" (0 "_"))))
 
 (defconst wolfram-symbol-subfix
-  (rx (* letter) (* num) (* "`" (+ letter) (* num)) (* space))
-  "the rx for a wolfram symbol subfix.")
+  (rx (* (or letter num)) (* "`" (+ letter) (* (or letter num))) (* space))
+  "The rx for a wolfram symbol subfix.")
 
 (defconst wolfram-operator
   (rx (or "@" "/@" "//@" "@@" "@@@"))
-  "the rx for a wolfram operator.")
+  "The rx for a wolfram operator.")
 
 (defvar wolfram-font-lock-keywords
   `(
