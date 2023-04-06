@@ -1,8 +1,9 @@
-;;; wolfram-mode.el --- Mathematica editing and inferior mode.  -*- lexical-binding: t -*-
+;;; wolfram-mode.el --- Mathematica editing and inferior mode  -*- lexical-binding: t -*-
 
+;; Version: 0.1
 ;; Filename: wolfram-mode.el
 ;; Description: Wolfram Language (Mathematica) editing and inferior Mode
-;; Package-Requires: ((emacs "24.3"))
+;; Package-Requires: ((emacs "25.1"))
 ;; Author: Daichi Mochihashi <daichi at cslab.kecl.ntt.co.jp>
 ;; Modified by: Taichi Kawabata <kawabata.taichi_at_gmail.com>
 ;; Modified by: Tomas Skrivan <skrivantomas_at_seznam.cz.cz>
@@ -81,15 +82,16 @@
 ;; 2013-11-23
 ;;         * Change `math-' prefix to `wolfram-' prefix.
 
-;; * Code:
+;;; Code:
 
 (require 'comint)
+(require 'lsp-mode)
 (require 'smie)
 
 ;; ** Customs Variables
 
 (defgroup wolfram nil
-  "Editing Wolfram Language code"
+  "Editing Wolfram Language code."
   :prefix "wolfram-"
   :group 'languages)
 
@@ -117,6 +119,11 @@ See `run-hooks'."
 (defcustom wolfram-path nil
   "Directory in Mathematica $Path. Emacs has to be able to write in this directory."
   :type 'string
+  :group 'wolfram)
+
+(defcustom wolfram-lsp-tcp-port 6536
+  "Specific which ssh remote host lsp-wl server connect to."
+  :type 'integer
   :group 'wolfram)
 
 ;; ** wolfram-mode
@@ -324,7 +331,34 @@ if that value is non-nil."
   (set (make-local-variable 'syntax-propertize-function)
        wolfram-syntax-propertize-function)
   (setq-local font-lock-defaults '(wolfram-font-lock-keywords nil nil))
-  (setq-local outline-regexp wolfram-outline-regexp))
+  (setq-local outline-regexp wolfram-outline-regexp)
+  (wolfram-lsp-variables))
+
+(defun wolfram-lsp-variables ()
+  "Local variables for lsp mode."
+  (setq-local lsp--tcp-port wolfram-lsp-tcp-port)
+  (setq-local lsp-tcp-connection-timeout 10)
+  (setq-local lsp-log-io t))
+
+;;;###autoload
+(add-to-list 'lsp-language-id-configuration '(wolfram-mode . "Mathematica"))
+
+;; Register local LSP server. by tcp connection
+(lsp-register-client
+ (make-lsp-client :language-id 'wolfram
+                  :new-connection (lsp-tcp-connection
+                  ;; :new-connection (lsp-tcp-server-command
+                                   (lambda (port)
+                                     `("wolfram" ;; or "wolframscript"
+                                       "-script" ;; or "-file"
+                                       "~/.local/lib/lsp-wl/init.wls"
+                                       ,(concat
+                                         "--tcp-server="
+                                         ;; "--socket="
+                                         (number-to-string port)))))
+                  :major-modes '(wolfram-mode)
+                  ;; :activation-fn (lsp-activate-on "Mathematica")
+                  :server-id 'lsp-wl))
 
 (defun wolfram-electric (char arg)
   "Indent on closing a CHAR ARG times."
